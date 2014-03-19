@@ -1,3 +1,13 @@
+/**
+ * bounce.js
+ *
+ * A skill game which consists of avoiding being
+ * hit by an army of bouncy balls.
+ *
+ * @author Carlos Afonso <carlos.afonso.perez@gmail.com>
+ *
+ */
+
 var self;
 
 function Bounce(cfg) {
@@ -36,6 +46,13 @@ function Bounce(cfg) {
 		self.cursor.y = e.pageY;
 	};
 
+	// also, moving the cursor out of the window
+	// automatically ends the game
+	document.onmouseout = function(e) {
+		self.gameOver();
+		document.onmouseout = null;
+	};
+
 	// add some balls to start the game
 	for (var i = 0; i < cfg.startingBalls; i++)
 		this.balls.push(this.generateBall());
@@ -43,6 +60,18 @@ function Bounce(cfg) {
 	this.draw();
 }
 
+/**
+ * Generates a single ball initialized with
+ * random values:
+ *
+ *	- Position: anywhere on the upper half of the screen
+ *	- Radius: between 30 and 70
+ *	- Horizontal speed: between 100 and 300
+ *	- Vertical speed: always 0
+ *	- Gravity acceleration: between 60 and 120
+ *	- Color: one from a predefined set
+ *
+ */
 Bounce.prototype.generateBall = function() {
 
 	// get a radius first (min 30, max 70)
@@ -56,10 +85,10 @@ Bounce.prototype.generateBall = function() {
 	var startY = Math.floor(Math.random() * (this.maxY / 2 - radius) + radius);
 
 	// also calculate is horizontal speed, which is constant...
-	var hSpeed = Math.floor(Math.random() * 300 + 100);
+	var hSpeed = Math.floor(Math.random() * 301 + 100);
 
 	// ... and it's gravity acceleration
-	var gravity = Math.floor(Math.random() * 120 + 60);
+	var gravity = Math.floor(Math.random() * 121 + 60);
 
 	// don't forget to pick a random color
 	var color = ['blue', 'red', 'yellow', 'orange', 'pink', 'green', 'black'][Math.floor(Math.random() * 7)];
@@ -79,6 +108,11 @@ Bounce.prototype.generateBall = function() {
 	return ball;
 };
 
+/**
+ * Clears the canvas and redraws everything
+ * again.
+ *
+ */
 Bounce.prototype.draw = function() {
 
 	// clear the canvas
@@ -104,6 +138,11 @@ Bounce.prototype.draw = function() {
 	this.ctx.fillText("BALLS: " + this.balls.length, this.maxX - 10, 30);
 };
 
+/**
+ * Halts the game and displays a popup box
+ * with a random goodbye message.
+ *
+ */
 Bounce.prototype.gameOver = function() {
 
 	this.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
@@ -132,6 +171,12 @@ Bounce.prototype.gameOver = function() {
 	this.ctx.fillText(text, this.maxX / 2, this.maxY / 2 + 10)
 };
 
+/**
+ * Main game loop. Recalculates all ball
+ * positions, updates score and checks for
+ * game over conditions.
+ *
+ */
 Bounce.prototype.loop = function() {
 
 	// calculate each ball's new position
@@ -139,7 +184,7 @@ Bounce.prototype.loop = function() {
 	{
 		var b = self.balls[i];
 
-		// check for a game over
+		// check if the mouse intersects this ball (that'd be a game over)
 		if (Math.sqrt((self.cursor.x - b.x) * (self.cursor.x - b.x) + (self.cursor.y - b.y) * (self.cursor.y - b.y)) < b.radius)
 		{
 			// cheerio!
@@ -175,12 +220,14 @@ Bounce.prototype.loop = function() {
 		b.x += dx;
 		b.y += dy;
 		
+		// calculate the vertical speed
 		b.speed.v = b.gravity * self.loopInterval / 1000 + b.speed.v;
 	}
 
 	// increase the score
 	self.score += 1;
 
+	// "nobody said this would be easy"
 	if (self.score % 40 == 0)
 	{
 		var newBalls = [];
@@ -190,6 +237,9 @@ Bounce.prototype.loop = function() {
 		self.balls = self.balls.concat(newBalls);
 	}
 
+	// redraw the canvas
 	self.draw();
-	window.setTimeout(self.loop, self.loopInterval);
+
+	// keep the action going
+	//window.setTimeout(self.loop, self.loopInterval);
 };

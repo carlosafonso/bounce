@@ -15,8 +15,6 @@ function Bounce(cfg) {
 	// some initialization
 	self = this;
 
-	this.loopInterval = 42;
-
 	this.minX = 0;
 	this.minY = 0;
 	this.maxX = window.innerWidth;
@@ -39,6 +37,7 @@ function Bounce(cfg) {
 		x: null,
 		y: null
 	};
+	this.lastFrame = new Date().getTime();		// the timestamp of the last frame
 
 	// need to keep an eye on the cursor position
 	document.onmousemove = function(e) {
@@ -58,6 +57,8 @@ function Bounce(cfg) {
 		this.balls.push(this.generateBall());
 
 	this.draw();
+
+	window.requestAnimationFrame(self.loop);
 }
 
 /**
@@ -179,6 +180,8 @@ Bounce.prototype.gameOver = function() {
  */
 Bounce.prototype.loop = function() {
 
+	var interval = new Date().getTime() - self.lastFrame;
+
 	// calculate each ball's new position
 	for (var i in self.balls)
 	{
@@ -193,8 +196,8 @@ Bounce.prototype.loop = function() {
 		}
 
 		// calculate its coordinate deltas
-		var dx = b.speed.h * self.loopInterval / 1000;
-		var dy = b.speed.v * self.loopInterval / 1000 + b.gravity * Math.pow(self.loopInterval / 1000, 2) / 2;
+		var dx = b.speed.h * interval / 1000;
+		var dy = b.speed.v * interval / 1000 + b.gravity * Math.pow(interval / 1000, 2) / 2;
 
 		// if any of those deltas exceeds the remaining space between the ball
 		// and the window boundaries, bounce!
@@ -221,7 +224,7 @@ Bounce.prototype.loop = function() {
 		b.y += dy;
 		
 		// calculate the vertical speed
-		b.speed.v = b.gravity * self.loopInterval / 1000 + b.speed.v;
+		b.speed.v = b.gravity * interval / 1000 + b.speed.v;
 	}
 
 	// increase the score
@@ -240,6 +243,9 @@ Bounce.prototype.loop = function() {
 	// redraw the canvas
 	self.draw();
 
+	// update the last frame timestamp
+	self.lastFrame = new Date().getTime();
+
 	// keep the action going
-	window.setTimeout(self.loop, self.loopInterval);
+	window.requestAnimationFrame(self.loop);
 };

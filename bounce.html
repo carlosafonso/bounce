@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bounce</title>
+	<link rel="stylesheet" href="bounce.css" />
+	<script type="text/javascript" src="bounce.js"></script>
+</head>
+<body>
+	<canvas id="bounce"></canvas>
+	<script type="text/javascript">
+		var initialize = function() {
+			var cfg = {
+				canvasId: 'bounce',
+				startingBalls: 10
+			};
+
+			var bounce = new Bounce(cfg);
+			bounce.loop();
+		};
+		
+		window.onload = initialize;
+	</script>
+</body>
+</html>

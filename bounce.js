@@ -241,5 +241,5 @@ Bounce.prototype.loop = function() {
 	self.draw();
 
 	// keep the action going
-	//window.setTimeout(self.loop, self.loopInterval);
+	window.setTimeout(self.loop, self.loopInterval);
 };
